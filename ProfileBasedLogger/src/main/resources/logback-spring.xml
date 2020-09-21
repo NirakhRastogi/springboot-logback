@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg%n"/>
+    <property name="ROLLING_LOG_PATTERN"
+              value="%d{dd-MM-yyyy HH:mm:ss.SSS} %thread %-5level %logger{36}.%M - %msg%n"/>
+    <property name="LOG_PATH" value="./logs"/>
+    <property name="LOG_FILE_NAME" value="output"/>
+    <springProfile name="default">
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="dev, stage, prod">
+        <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${ROLLING_LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!-- Daily rollover -->
+                <fileNamePattern>${LOG_PATH}/archived/${LOG_FILE_NAME}_%d-%i.log</fileNamePattern>
+                <!-- Keep history or 120 days -->
+                <maxHistory>120</maxHistory>
+                <!-- Max history size 100MB -->
+                <totalSizeCap>100MB</totalSizeCap>
+                <!-- Max file size, %i, is mandatory to use in fileName if using maxFileSize -->
+                <maxFileSize>10KB</maxFileSize>
+            </rollingPolicy>
+        </appender>
+        <root level="ERROR">
+            <appender-ref ref="ROLLING_FILE"/>
+        </root>
+    </springProfile>
+
+
+</configuration>
